@@ -1,5 +1,6 @@
 import os
 import json
+from urllib import request
 
 import argparse
 import json
@@ -26,7 +27,7 @@ conf_local_tmp = conf_local_tmp = '/tmp/data'
 conf_cities = conf_cities = {'Amsterdam': (52.37, 4.89), 'Paris': (48.85, 2.35), 'Berlin': (52.52, 13.41), 'Rome': (41.9, 12.5), 'Lisbon': (38.72, -9.14)}
 
 def fetch_json(url):
-    with urllib.request.urlopen(url, timeout=15) as resp:
+    with request.urlopen(url, timeout=15) as resp:
         return json.loads(resp.read().decode('utf-8'))
 
 def fetch_current(lat, lon):
