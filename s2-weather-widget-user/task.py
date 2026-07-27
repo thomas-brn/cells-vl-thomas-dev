@@ -1,6 +1,4 @@
-from ipywidgets.embed import embed_minimal_html
 import os
-import ipywidgets as widgets
 from urllib import request
 import json
 
@@ -39,23 +37,28 @@ def fetch_current(lat, lon):
 
 os.makedirs(conf_local_tmp, exist_ok=True)
 
-city_names = list(conf_cities.keys())
-tabs_children = []
+tabs_html = []
 for city, (lat, lon) in conf_cities.items():
     current = fetch_current(lat, lon)
-    info = (
-        f"<b>{current['temperature_2m']} °C</b><br>"
+    tabs_html.append(
+        f"<section><h2>{city}</h2>"
+        f"<p><b>{current['temperature_2m']} °C</b><br>"
         f"Humidity: {current['relative_humidity_2m']}%<br>"
-        f"Wind: {current['wind_speed_10m']} km/h"
+        f"Wind: {current['wind_speed_10m']} km/h</p></section>"
         )
-    tabs_children.append(widgets.HTML(value=info))
 
-city_tabs = widgets.Tab(children=tabs_children)
-for i, city in enumerate(city_names):
-    city_tabs.set_title(i, city)
+page = (
+    "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'>"
+    "<title>City weather</title><style>"
+    "body{font-family:sans-serif;display:flex;gap:1rem;flex-wrap:wrap}"
+    "section{border:1px solid #ccc;border-radius:8px;padding:1rem}"
+    "</style></head><body>" + "".join(tabs_html) + "</body></html>"
+    )
 
 widget_html_path = os.path.join(conf_local_tmp, 'weather_widget.html')
-embed_minimal_html(widget_html_path, views=[city_tabs], title='City weather (ipywidgets)')
+with open(widget_html_path, 'w') as f:
+    f.write(page)
+
 print(f'Wrote {widget_html_path}')
 
 file_widget_html_path = open("/tmp/widget_html_path_" + id + ".json", "w")
